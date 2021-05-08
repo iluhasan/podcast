@@ -1,0 +1,45 @@
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+    <channel>
+        <title>Test Podcast</title>
+        <language>cs</language>
+        <copyright>Stratify 2021</copyright>
+        <link>https://test/rss/feed</link>
+        <ttl>1440</ttl>
+        <description>
+            <![CDATA[ Stub RSS feed. ]]>
+        </description>
+        <item>
+            <title>Item 1</title>
+            <description>Test Item 1</description>
+            <itunes:subtitle>Test Item 1</itunes:subtitle>
+            <itunes:summary>Test Item 1</itunes:summary>
+            <itunes:duration>00:19:25</itunes:duration>
+            <pubDate>%PUBDATE1%</pubDate>
+            <enclosure url="%PODCAST1%" type="audio/mpeg" length="27969720"/>
+            <guid isPermaLink="false">podcast1</guid>
+            <link>https://test/1</link>
+        </item>
+        <item>
+            <title>Item 2</title>
+            <description>Test Item 2</description>
+            <itunes:subtitle>Test Item 2</itunes:subtitle>
+            <itunes:summary>Test Item 2</itunes:summary>
+            <itunes:duration>00:26:29</itunes:duration>
+            <pubDate>%PUBDATE2%</pubDate>
+            <enclosure url="%PODCAST2%" type="audio/mpeg" length="63550229"/>
+            <guid isPermaLink="false">podcast2</guid>
+            <link>https://test/2</link>
+        </item>
+        <item>
+            <title>Item 3</title>
+            <description>Test Item 3</description>
+            <itunes:subtitle>Test Item 3</itunes:subtitle>
+            <itunes:summary>Test Item 3</itunes:summary>
+            <itunes:duration>00:25:11</itunes:duration>
+            <pubDate>%PUBDATE3%</pubDate>
+            <enclosure url="%PODCAST3%" type="audio/mpeg" length="36271017"/>
+            <guid isPermaLink="false">podcast3</guid>
+            <link>https://test/3</link>
+        </item>
+    </channel>
+</rss>
