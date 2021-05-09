@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.IOException;
@@ -20,17 +22,52 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.example.podcast.PodcastTestConfig.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(CamelSpringBootRunner.class)
-@SpringBootTest(classes = { PodcastTestConfig.class }, properties = {
+@SpringBootTest(properties = {
         "spring.main.allow-bean-definition-overriding=true",
         "notOlderThanDays=4"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class MyRouteBuilderTests {
+    private static final String StateFileInMockUrl = "stub:file:stateFile";
+    private static final String StateFileOutMockUrl = "mock:stateFile";
+    private static final String RssFeedMockUrl = "mock:rssFeed";
+    private static final String DestFolderMockUrl = "mock:destFolder";
+    private static final String Podcast1MockUrl = "mock:podcast1";
+    private static final String Podcast2MockUrl = "mock:podcast2";
+    private static final String Podcast3MockUrl = "mock:podcast3";
+
+    @TestConfiguration
+    static class PodcastTestConfig {
+        @Bean
+        public UrlProvider urlProvider() {
+            return new UrlProvider(){
+                @Override
+                public String getStateFileInUrl() {
+                    return StateFileInMockUrl;
+                }
+
+                @Override
+                public String getStateFileOutUrl() {
+                    return StateFileOutMockUrl;
+                }
+
+                @Override
+                public String getRssFeedUrl() {
+                    return RssFeedMockUrl;
+                }
+
+                @Override
+                public String getDestFolderUrl() {
+                    return DestFolderMockUrl;
+                }
+            };
+        }
+    }
+
     @Autowired
     private CamelContext context;
 
@@ -82,7 +119,7 @@ public class MyRouteBuilderTests {
 
         // podcasts not older than 3 days should be loaded
         String latestLoadedPodcastDate = minus3days;
-        template.sendBody(PodcastTestConfig.StateFileInMockUrl, latestLoadedPodcastDate);
+        template.sendBody(StateFileInMockUrl, latestLoadedPodcastDate);
 
         // rss feed fetched
         mockRss.expectedMessageCount(1);
@@ -112,7 +149,7 @@ public class MyRouteBuilderTests {
         mockStateFile.message(0).body().isEqualTo(today); // publication date of the latest stored podcast
 
         NotifyBuilder notify = new NotifyBuilder(context)
-                .wereSentTo(PodcastTestConfig.StateFileOutMockUrl)
+                .wereSentTo(StateFileOutMockUrl)
                 .whenDone(1)
                 .create();
 
@@ -131,7 +168,7 @@ public class MyRouteBuilderTests {
 
         // all podcasts have been loaded as of now
         String latestLoadedPodcastDate = today;
-        template.sendBody(PodcastTestConfig.StateFileInMockUrl, latestLoadedPodcastDate);
+        template.sendBody(StateFileInMockUrl, latestLoadedPodcastDate);
 
         // rss feed fetched
         mockRss.expectedMessageCount(1);
@@ -149,7 +186,7 @@ public class MyRouteBuilderTests {
         mockStateFile.message(0).body().isEqualTo(today); // the same latestLoadedPodcastDate is stored
 
         NotifyBuilder notify = new NotifyBuilder(context)
-                .wereSentTo(PodcastTestConfig.StateFileOutMockUrl)
+                .wereSentTo(StateFileOutMockUrl)
                 .whenDone(1)
                 .create();
 
@@ -168,7 +205,7 @@ public class MyRouteBuilderTests {
         assertThat(context.getStatus()).isEqualTo(ServiceStatus.Started);
 
         // no state file
-        template.sendBody(PodcastTestConfig.StateFileInMockUrl, null);
+        template.sendBody(StateFileInMockUrl, null);
 
         // rss feed fetched
         mockRss.expectedMessageCount(1);
@@ -198,7 +235,7 @@ public class MyRouteBuilderTests {
         mockStateFile.message(0).body().isEqualTo(today); // publication date of the latest stored podcast
 
         NotifyBuilder notify = new NotifyBuilder(context)
-                .wereSentTo(PodcastTestConfig.StateFileOutMockUrl)
+                .wereSentTo(StateFileOutMockUrl)
                 .whenDone(1)
                 .create();
 
@@ -236,7 +273,7 @@ public class MyRouteBuilderTests {
         // the state file is not updated
         mockStateFile.expectedMessageCount(0);
 
-        template.sendBody(PodcastTestConfig.StateFileInMockUrl, latestLoadedPodcastDate);
+        template.sendBody(StateFileInMockUrl, latestLoadedPodcastDate);
         NotifyBuilder notify = new NotifyBuilder(context)
                 .whenFailed(1)
                 .create();

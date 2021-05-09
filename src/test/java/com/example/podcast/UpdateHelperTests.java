@@ -2,8 +2,6 @@ package com.example.podcast;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.core.env.Environment;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -15,8 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class UpdateHelperTests {
 
-    private static Environment env;
-
     private static String startOfTime;
     private static String today;
     private static String minus2days;
@@ -24,9 +20,6 @@ public class UpdateHelperTests {
 
     @BeforeAll
     public static void beforeAllTestMethods() {
-        env = Mockito.mock(Environment.class);
-        Mockito.when(env.getProperty("notOlderThanDays")).thenReturn("3");
-
         startOfTime = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault()).format(DateTimeFormatter.RFC_1123_DATE_TIME);
         today = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
         minus2days = ZonedDateTime.now().minusDays(2).format(DateTimeFormatter.RFC_1123_DATE_TIME);
@@ -38,7 +31,7 @@ public class UpdateHelperTests {
         String publicationDate = today;
         String latestLoadedPodcastDate = null;
 
-        UpdateHelper updateHelper = new UpdateHelper(this.env);
+        UpdateHelper updateHelper = new UpdateHelper(3);
         Boolean result = updateHelper.isSuitablePublication(publicationDate, latestLoadedPodcastDate);
         String latestPodcastDate = updateHelper.getLatestPodcastDate();
 
@@ -51,7 +44,7 @@ public class UpdateHelperTests {
         String publicationDate = minus5days;
         String latestLoadedPodcastDate = null;
 
-        UpdateHelper updateHelper = new UpdateHelper(this.env);
+        UpdateHelper updateHelper = new UpdateHelper(3);
         Boolean result = updateHelper.isSuitablePublication(publicationDate, latestLoadedPodcastDate);
         String latestPodcastDate = updateHelper.getLatestPodcastDate();
 
@@ -64,7 +57,7 @@ public class UpdateHelperTests {
         String publicationDate = minus2days;
         String latestLoadedPodcastDate = today;
 
-        UpdateHelper updateHelper = new UpdateHelper(this.env);
+        UpdateHelper updateHelper = new UpdateHelper(3);
         Boolean result = updateHelper.isSuitablePublication(publicationDate, latestLoadedPodcastDate);
         String latestPodcastDate = updateHelper.getLatestPodcastDate();
 
@@ -77,7 +70,7 @@ public class UpdateHelperTests {
         String publicationDate = today;
         String latestLoadedPodcastDate = minus2days;
 
-        UpdateHelper updateHelper = new UpdateHelper(this.env);
+        UpdateHelper updateHelper = new UpdateHelper(3);
         Boolean result = updateHelper.isSuitablePublication(publicationDate, latestLoadedPodcastDate);
         String latestPodcastDate = updateHelper.getLatestPodcastDate();
 
@@ -90,7 +83,7 @@ public class UpdateHelperTests {
         String publicationDate = "wrong_date";
         String latestLoadedPodcastDate = today;
 
-        UpdateHelper updateHelper = new UpdateHelper(this.env);
+        UpdateHelper updateHelper = new UpdateHelper(3);
         Boolean result = updateHelper.isSuitablePublication(publicationDate, latestLoadedPodcastDate);
         String latestPodcastDate = updateHelper.getLatestPodcastDate();
 

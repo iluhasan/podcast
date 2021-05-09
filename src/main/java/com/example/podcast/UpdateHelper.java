@@ -2,23 +2,25 @@ package com.example.podcast;
 
 import org.apache.camel.language.simple.Simple;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.time.*;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
 public class UpdateHelper {
     private final ZonedDateTime startOfTime = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneId.systemDefault());
 
-    private ZonedDateTime notOlderThanDate;
+    private int notOlderThanDays;
     private ZonedDateTime latestPodcastDate;
 
     @Autowired
-    public UpdateHelper(Environment env) {
-        Integer notOlderThanDays = Integer.parseInt(env.getProperty("notOlderThanDays"));
-        this.notOlderThanDate = ZonedDateTime.now().minusDays(notOlderThanDays);
+    public UpdateHelper(@Value("${notOlderThanDays}") int notOlderThanDays) {
+        this.notOlderThanDays = notOlderThanDays;
         this.latestPodcastDate = startOfTime;
     }
 
@@ -34,7 +36,8 @@ public class UpdateHelper {
                 this.latestPodcastDate = currentPodcastDate;
             }
 
-            return (currentPodcastDate.compareTo(this.notOlderThanDate) >= 0 && currentPodcastDate.compareTo(needNewerThanDate) > 0);
+            ZonedDateTime notOlderThanDate = ZonedDateTime.now().minusDays(this.notOlderThanDays);
+            return (currentPodcastDate.compareTo(notOlderThanDate) >= 0 && currentPodcastDate.compareTo(needNewerThanDate) > 0);
         } catch (DateTimeException exc) {
             System.out.println("Date parsing failed: " + exc.getMessage());
             return true;
